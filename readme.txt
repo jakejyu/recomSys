@@ -13,3 +13,7 @@ Testing example: python event_recommend_user_simi.py 2233 10
 
 2. To recommend users for new event in a group. Need to prov
 Testing example: python user_recommend_event_simi.py 2233 20
+
+
+Data link: 
+https://drive.google.com/folderview?id=0B0Ci6z-DS7QmfmtUSUZzZ3FfaEEzZzZRX242dURwWUFyRlJwTEtTLS1Sdlh5QmkyUHd1M0k&usp=sharing
