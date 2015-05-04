@@ -2,10 +2,11 @@
 __author__ = 'Jiang'
 
 # Project: recommendation system for event-based on line social networking.
-# Data from meetup.com:
+# 2015-05-03
+# Data from meetup.com
 
-# part 1: recommend new events to users
-# - Algorithm 1 ranking according to event similarity (event description)
+# part 1: recommend users for new events
+# - Ranking according to event similarity (event description)
 
 from collections import OrderedDict
 
@@ -29,33 +30,11 @@ Incremental developing steps:
 """
 
 
-class Vividict(dict):
-    """
-    implement nested dictionaries
-    e.g. of usage
-    d = Vividict()
-    d['foo']['bar']
-    d['foo']['baz']
-    d['fizz']['buzz']
-    d['primary']['secondary']['tertiary']['quaternary']
-    pprint.pprint(d)
-    Which outputs:
-    {'fizz': {'buzz': {}},
-     'foo': {'bar': {}, 'baz': {}},
-     'primary': {'secondary': {'tertiary': {'quaternary': {}}}}}
-
-     refer to
-    http://stackoverflow.com/questions/635483/what-is-the-best-way-to-implement-nested-dictionaries-in-python/19829714#19829714
-    """
-
-    def __missing__(self, key):
-        value = self[key] = type(self)()
-        return value
-
 
 def get_entity_dictionary(filename):
     """ Input: a .json file name and the stopwords file name
     Return: the entity Dictionary of all descriptions of all events; the entity Dictionary for each event"""
+
     # load event data json file
     try:
         json_data = open(filename)
@@ -63,6 +42,7 @@ def get_entity_dictionary(filename):
         json_data.close()
     except IOError:
         print('IO Error in reading file:', filename)
+
     # read stopwords file
     try:
         f = open("stop_words.txt")
@@ -70,6 +50,7 @@ def get_entity_dictionary(filename):
         f.close()
     except IOError:
         print('IO Error reading file: stopwords.txt')
+
     # build entity dictionaries for all events' description and each one/'s
     dic = {}  # the whole dic
     dic_event = Vividict()  # nested dic for all events
@@ -165,6 +146,7 @@ def split_events(dic_event):
 
 
 def get_recommended_users(sorted_future_past_event_simi_table, group_id, max_num_recommend_events):
+
     # read groupEventMember file
     try:
         f = open('E:/projects/data/groupEventMember/' + group_id + '.txt')
@@ -172,6 +154,7 @@ def get_recommended_users(sorted_future_past_event_simi_table, group_id, max_num
         f.close()
     except IOError:
         print('IO Error reading file: groupEventMember')
+
     # read groupEventMember file
     try:
         f = open('E:/projects/data/groupEventMemberSequence/' + group_id + '.txt')
@@ -180,9 +163,9 @@ def get_recommended_users(sorted_future_past_event_simi_table, group_id, max_num
     except IOError:
         print('IO Error reading file: groupEventMemberSequence')
 
-    # with open('output/test_group_event_member_sequence' + group_id + '.txt', 'w') as outfile:
+    # with open('output/intermediate_data/test_group_event_member_sequence' + group_id + '.txt', 'w') as outfile:
     #     json.dump(group_event_member_sequence, outfile)
-    # with open('output/test_group_event_member' + group_id + '.txt', 'w') as outfile:
+    # with open('output/intermediate_data/test_group_event_member' + group_id + '.txt', 'w') as outfile:
     #     json.dump(group_event_member, outfile)
 
     # get recommended users for the future events in the group
@@ -194,18 +177,13 @@ def get_recommended_users(sorted_future_past_event_simi_table, group_id, max_num
             event_index = int(group_event_member_sequence.index(key) / 2)  # get the index of the similar event.
             # need to divided by 2, because the date entries double the size.
             # print(key, event_index)
-            # print(group_event_member[event_index])
             user_index_line = group_event_member[event_index].split()  # split into user index
-            # print(user_index_line)
 
             recommend_user_index = 0
-            # print("Recommended users are: ")
             for user_attend_indicate in user_index_line:
                 if num_recommend_users > max_num_recommend_events:
                     break
                 if user_attend_indicate == "1":
-                    # print(user_index_line.index(user))
-                    # print(str(recommend_user_index))
                     if recommended_users.__contains__(key_future_event):
                         if recommend_user_index not in recommended_users[key_future_event]:
                             num_recommend_users += 1
@@ -213,13 +191,10 @@ def get_recommended_users(sorted_future_past_event_simi_table, group_id, max_num
                     else:
                         recommended_users[key_future_event] = {recommend_user_index}
                         num_recommend_users += 1
-                    # print(user_index_line.__sizeof__())
                 recommend_user_index += 1
 
-    # with open('output/recommended_users' + group_id + '.txt', 'w') as outfile:
-    # json.dump(recommended_users, outfile)
-
     return recommended_users
+
 
 #  Turn sets into lists before serializing, or use a custom default handler to do so:
 def set_default(obj):
@@ -234,21 +209,11 @@ def main():
     Output: recommended users for events in a group
     """
 
+    # input group id and number of recommend results
     while len(sys.argv) != 3 or int(sys.argv[2]) <= 0:
         print('Wrong input!')
         print('Please input a group ID and top K recommending users again!')
         sys.exit(1)
-        # try:
-        #     group_id = sys.argv[1]
-        #     max_num_recommend_events = int(sys.argv[2]) - 1  # max num of events recommending for each user,
-        #     break
-        # except ValueError:
-        #     print("Oops!  That was no valid input.  Try again...")
-        #     print('Usage: Please input a group ID and top K recommending users!')
-
-    # if not sys.argv or len(sys.argv) != 3 or sys.argv[2] <= 0:
-    #     print('Wrong input! Please input a group ID and top K recommending users!')
-    #     sys.exit(1)
 
     group_id = sys.argv[1]
     max_num_recommend_events = int(sys.argv[2]) - 1  # max num of events recommending for each user,
@@ -268,22 +233,19 @@ def main():
         similarity_re[keyUnknown] = {}
         for keyKnown in dic_known:
             similarity_re[keyUnknown][keyKnown] = similarity_cosine_re(dic_unknown[keyUnknown], dic_known[keyKnown])
-            # similarity_re[(keyUnknown, keyKnown)] = similarity_cosine_re(dic_unknown[keyUnknown], dic_known[keyKnown])
-        # print (similarity_re)
 
-    # file_similar = open('output/similarity' + group_id + '.txt', 'w')
-    # # file_similar.write('Ranked similarity:\n')
-    # # ??? how to sorted by key[1] and key=similarity_re.get, sort twice???
-    # for key in similarity_re:
-    # # for key in sorted(similarity_re, key=similarity_re.get, reverse=True):
-    # #     similarity_ranked_re[key] = similarity_re[key]
-    #     # print (similarity_ranked_re[key])
-    #     file_similar.write(str(key))
-    #     file_similar.write(str(similarity_re[key]) + '\n')
-    #     # if similarity_ranked_re[key] == 1:  # for debugging
-    #     #     file_similar.write(str(sorted(dic_event[key[0]])) + '\n')  # for debugging
-    #     #     file_similar.write(str(sorted(dic_event[key[1]])) + '\n')  # for debugging
-    # file_similar.close()
+    file_similar = open('output/intermediate_data/similarity' + group_id + '.txt', 'w')
+    # to sorted by key[1] and key=similarity_re.get, sort twice
+    for key in similarity_re:
+    # for key in sorted(similarity_re, key=similarity_re.get, reverse=True):
+    #     similarity_ranked_re[key] = similarity_re[key]
+        # print (similarity_ranked_re[key])
+        file_similar.write(str(key))
+        file_similar.write(str(similarity_re[key]) + '\n')
+        # if similarity_ranked_re[key] == 1:  # for debugging
+        #     file_similar.write(str(sorted(dic_event[key[0]])) + '\n')  # for debugging
+        #     file_similar.write(str(sorted(dic_event[key[1]])) + '\n')  # for debugging
+    file_similar.close()
 
     future_past_event_simi_table = {}
     for key in similarity_re:
@@ -323,13 +285,6 @@ def main():
     with open('output/recommended_users_for_events_in_group_' + group_id + '.txt', 'w') as outfile:
         json.dump(recommended_users, outfile, default=set_default)
 
-    # file_recom = open('output/' + group_id + '.txt', 'w')
-    # file_recom.write("Recommended users for the the event " + " are :")
-    # file_recom.close()
-
-    # print (dic)
-    #    print (dic_event)
-
     # print out recommendation results
     print("Recommend users for new event, based on event similarity!")
     print("The Top " + str(max_num_recommend_events + 1) + " recommendation result for group " + group_id +
@@ -338,11 +293,30 @@ def main():
         print("The user Id of recommended users for the event " + key + " are: ")
         print(recommended_users[key])
 
-    # print('The total number of events in the group is:', count_event)
 
-# print ('Revised Similarity is:', similarity_re)
-#    print ('Ranked Revised Similarity is:', similarity_ranked_re)
-#    print ('Recommend users are:?')
+
+class Vividict(dict):
+    """
+    implement nested dictionaries
+    e.g. of usage
+    d = Vividict()
+    d['foo']['bar']
+    d['foo']['baz']
+    d['fizz']['buzz']
+    d['primary']['secondary']['tertiary']['quaternary']
+    pprint.pprint(d)
+    Which outputs:
+    {'fizz': {'buzz': {}},
+     'foo': {'bar': {}, 'baz': {}},
+     'primary': {'secondary': {'tertiary': {'quaternary': {}}}}}
+
+     refer to
+    http://stackoverflow.com/questions/635483/what-is-the-best-way-to-implement-nested-dictionaries-in-python/19829714#19829714
+    """
+    def __missing__(self, key):
+        value = self[key] = type(self)()
+        return value
+
 
 if __name__ == '__main__':
     main()
