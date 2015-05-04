@@ -308,7 +308,7 @@ def main():
         sorted_future_past_event_simi_table[key] = ord_dic
 
 
-    with open('output/sorted_future_past_event_simi_table' + group_id + '.txt', 'w') as outfile:
+    with open('output/intermediate_data/sorted_future_past_event_simi_table' + group_id + '.txt', 'w') as outfile:
         json.dump(sorted_future_past_event_simi_table, outfile)
 
     # for key in future_past_event_simi_table:

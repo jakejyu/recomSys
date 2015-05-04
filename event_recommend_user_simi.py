@@ -52,7 +52,7 @@ def main():
             # line = line.strip()  # strip off any trailing whitespace(including '\n')
             event_user_matrix.append([int(x) for x in line.split()])
 
-    with open('output/event_user_matrix' + group_id + '.txt', 'w') as outfile:
+    with open('output/intermediate_data/event_user_matrix' + group_id + '.txt', 'w') as outfile:
         json.dump(event_user_matrix, outfile)
 
     row_num = len(event_user_matrix)
@@ -102,7 +102,7 @@ def main():
                 # else:
                 #     event_attended_simi_table[j][k] = [similarity_tmp]
 
-    with open('output/event_attended_simi_table' + group_id + '.txt', 'w') as outfile:
+    with open('output/intermediate_data/event_attended_simi_table' + group_id + '.txt', 'w') as outfile:
             json.dump(event_attended_simi_table, outfile)
 
     # compute similar users for each user in the group
@@ -129,7 +129,7 @@ def main():
         # with open('output/tmp_sorted' + group_id + '.txt', 'w') as outfile:
         #         json.dump(tmp, outfile)
 
-    with open('output/recom_users_dic' + group_id + '.txt', 'w') as outfile:
+    with open('output/intermediate_data/recom_users_dic' + group_id + '.txt', 'w') as outfile:
             json.dump(recom_users_dic, outfile)
 
     # get recommended events for each users in the group
@@ -154,7 +154,7 @@ def main():
                 if num_recommend_event > max_num_recommend_events:
                     break
 
-    with open('output/recom_events_for_users_in_group_' + group_id + '.txt', 'w') as outfile:
+    with open('output/recommended_events_for_users_in_group_' + group_id + '.txt', 'w') as outfile:
             json.dump(recom_events_dic, outfile, default=set_default)
 
     # print out recommendation results
